@@ -7,7 +7,9 @@
  */
 
 namespace Joomla\Application\Web;
-require_once '../vendor/autoload.php';
+
+require_once 'vendor/autoload.php';
+
 use UserAgentParser\Provider;
 use UserAgentParser\Exception\NoResultFoundException;
 
