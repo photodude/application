@@ -167,12 +167,6 @@ class WebClient
 	protected $robot = false;
 
 	/**
-	 * @var    boolean  True if the web client is Mobile device.
-	 * @since  __DEPLOY_VERSION__
-	 */
-	protected $mobile = false;
-
-	/**
 	 * @var    array  An array of flags determining whether or not a detection routine has been run.
 	 * @since  1.0
 	 */
