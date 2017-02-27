@@ -7,7 +7,8 @@
  */
 
 namespace Joomla\Application\Web;
-
+use UserAgentParser\Provider;
+use UserAgentParser\Exception\NoResultFoundException;
 
 /**
  * Class to model a Web Client.
@@ -54,6 +55,27 @@ class WebClient
 	const ANDROIDTABLET = 22;
 	const EDGE = 23;
 	const BLINK = 24;
+
+	/**
+	 * @var    UserAgentParser\Provider\Chain  The provider chain.
+	 * @since  __DEPLOY_VERSION__
+	 */
+	protected $providerChain;
+
+	/**
+	 * @var    array  an array of providers used for chaining.
+	 * @since  __DEPLOY_VERSION__
+	 */
+	public $chainArray = array(
+							new Provider\PiwikDeviceDetector(),
+							new Provider\WhichBrowser(),
+							);
+
+	/**
+	 * @var    \UserAgentParser\Model\UserAgent The result from parsing the user agent.
+	 * @since  __DEPLOY_VERSION__
+	 */
+	protected $result;
 
 	/**
 	 * @var    integer  The detected platform on which the web client runs.
@@ -173,6 +195,9 @@ class WebClient
 		{
 			$this->acceptLanguage = $acceptLanguage;
 		}
+
+		$this->providerChain = self::getProvider();
+		$this->result = self::getResult($this->userAgent);
 	}
 
 	/**
@@ -247,6 +272,64 @@ class WebClient
 	}
 
 	/**
+	 * Method to get the result object.
+	 *
+	 * @param   array  $chainArray  An array of chain providers for parsing.
+	 *
+	 * @return void
+	 *
+	 * @since   __DEPLOY_VERSION__
+	 */
+	protected function getProvider($chainArray = null)
+	{
+		// If an explicit chain Array was given attempt to use it.
+		if ($chainArray != null)
+		{
+			$this->chainArray = $chainArray;
+		}
+
+		$this->providerChain = new Provider\Chain($this->chainArray);
+	}
+
+	/**
+	 * Method to get the result object.
+	 *
+	 * @param   string  $userAgent  The user-agent string to parse.
+	 * @param   UserAgentParser\Provider\Chain  $providerChain  The provider chain.
+	 *
+	 * @return void
+	 *
+	 * @since   __DEPLOY_VERSION__
+	 */
+	protected function getResult($userAgent)
+	{
+		$chain = new Provider\Chain(array(
+									new Provider\PiwikDeviceDetector(),
+									new Provider\WhichBrowser(),
+									)
+		);
+
+		try
+		{
+			if (function_exists('getallheaders'))
+			// If php is working under Apache, there is a special function
+			{
+				// Optional add all headers, to improve the result further (used currently only by WhichBrowser)
+				$this->result = $chain->parse($userAgent, getallheaders());
+			}
+			else
+			{
+				$this->result = $chain->parse($userAgent);	
+			}
+
+		}
+		catch (NoResultFoundException $ex)
+		{
+			// nothing found
+		}
+	}
+
+	/**
 	 * Detects the client browser and version in a user agent string.
 	 *
 	 * @param   string  $userAgent  The user-agent string to parse.
@@ -257,88 +340,10 @@ class WebClient
 	 */
 	protected function detectBrowser($userAgent)
 	{
-		// Attempt to detect the browser type.  Obviously we are only worried about major browsers.
-		if ((stripos($userAgent, 'MSIE') !== false) && (stripos($userAgent, 'Opera') === false))
-		{
-			$this->browser = self::IE;
-			$patternBrowser = 'MSIE';
-		}
-		elseif (stripos($userAgent, 'Trident') !== false)
-		{
-			$this->browser = self::IE;
-			$patternBrowser = ' rv';
-		}
-		elseif (stripos($userAgent, 'Edge') !== false)
-		{
-			$this->browser = self::EDGE;
-			$patternBrowser = 'Edge';
-		}
-		elseif ((stripos($userAgent, 'Firefox') !== false) && (stripos($userAgent, 'like Firefox') === false))
-		{
-			$this->browser = self::FIREFOX;
-			$patternBrowser = 'Firefox';
-		}
-		elseif (stripos($userAgent, 'OPR') !== false)
-		{
-			$this->browser = self::OPERA;
-			$patternBrowser = 'OPR';
-		}
-		elseif (stripos($userAgent, 'Chrome') !== false)
-		{
-			$this->browser = self::CHROME;
-			$patternBrowser = 'Chrome';
-		}
-		elseif (stripos($userAgent, 'Safari') !== false)
-		{
-			$this->browser = self::SAFARI;
-			$patternBrowser = 'Safari';
-		}
-		elseif (stripos($userAgent, 'Opera') !== false)
-		{
-			$this->browser = self::OPERA;
-			$patternBrowser = 'Opera';
-		}
+		// Attempt to detect the browser type.
+		$this->browser = $this->result->getBrowser()->getName();
+		$this->browserVersion = $this->result->getBrowser()->getVersion()->getComplete();
 
-		// If we detected a known browser let's attempt to determine the version.
-		if ($this->browser)
-		{
-			// Build the REGEX pattern to match the browser version string within the user agent string.
-			$pattern = '#(?<browser>Version|' . $patternBrowser . ')[/ :]+(?<version>[0-9.|a-zA-Z.]*)#';
-
-			// Attempt to find version strings in the user agent string.
-			$matches = array();
-
-			if (preg_match_all($pattern, $userAgent, $matches))
-			{
-				// Do we have both a Version and browser match?
-				if (count($matches['browser']) == 2)
-				{
-					// See whether Version or browser came first, and use the number accordingly.
-					if (strripos($userAgent, 'Version') < strripos($userAgent, $patternBrowser))
-					{
-						$this->browserVersion = $matches['version'][0];
-					}
-					else
-					{
-						$this->browserVersion = $matches['version'][1];
-					}
-				}
-				elseif (count($matches['browser']) > 2)
-				{
-					$key = array_search('Version', $matches['browser']);
-
-					if ($key)
-					{
-						$this->browserVersion = $matches['version'][$key];
-					}
-				}
-				else
-				// We only have a Version or a browser so use what we have.
-				{
-					$this->browserVersion = $matches['version'][0];
-				}
-			}
-		}
 
 		// Mark this detection routine as run.
 		$this->detection['browser'] = true;
@@ -373,74 +378,9 @@ class WebClient
 	 */
 	protected function detectEngine($userAgent)
 	{
-		if (stripos($userAgent, 'MSIE') !== false || stripos($userAgent, 'Trident') !== false)
-		{
-			// Attempt to detect the client engine -- starting with the most popular ... for now.
-			$this->engine = self::TRIDENT;
-		}
-		elseif (stripos($userAgent, 'Edge') !== false || stripos($userAgent, 'EdgeHTML') !== false)
-		{
-			$this->engine = self::EDGE;
-		}
-		elseif (stripos($userAgent, 'Chrome') !== false)
-		{
-			$result  = explode('/', stristr($userAgent, 'Chrome'));
-			$version = explode(' ', $result[1]);
-
-			if ($version[0] >= 28)
-			{
-				$this->engine = self::BLINK;
-			}
-			else
-			{
-				$this->engine = self::WEBKIT;
-			}
-		}
-		elseif (stripos($userAgent, 'AppleWebKit') !== false || stripos($userAgent, 'blackberry') !== false)
-		{
-			if (stripos($userAgent, 'AppleWebKit') !== false)
-			{
-				$result  = explode('/', stristr($userAgent, 'AppleWebKit'));
-				$version = explode(' ', $result[1]);
-
-				if ($version[0] === 537.36)
-				{
-					// AppleWebKit/537.36 is Blink engine specific, exception is Blink emulated IEMobile, Trident or Edge
-					$this->engine = self::BLINK;
-				}
-			}
-
-			// Evidently blackberry uses WebKit and doesn't necessarily report it.  Bad RIM.
-			$this->engine = self::WEBKIT;
-		}
-		elseif (stripos($userAgent, 'Gecko') !== false && stripos($userAgent, 'like Gecko') === false)
-		{
-			// We have to check for like Gecko because some other browsers spoof Gecko.
-			$this->engine = self::GECKO;
-		}
-		elseif (stripos($userAgent, 'Opera') !== false || stripos($userAgent, 'Presto') !== false)
-		{
-			$result  = explode('/', stristr($userAgent, 'Opera'));
-			$version = explode(' ', $result[1]);
-
-			if ($version[0] >= 15)
-			{
-				$this->engine = self::BLINK;
-			}
-
-			// Sometimes Opera browsers don't say Presto.
-			$this->engine = self::PRESTO;
-		}
-		elseif (stripos($userAgent, 'KHTML') !== false)
-		{
-			// *sigh*
-			$this->engine = self::KHTML;
-		}
-		elseif (stripos($userAgent, 'Amaya') !== false)
-		{
-			// Lesser known engine but it finishes off the major list from Wikipedia :-)
-			$this->engine = self::AMAYA;
-		}
+		// Attempt to detect the client engine
+		$this->engine =  $this->result->getRenderingEngine()->getName();
+		$this->engineVersion =  $this->result->getRenderingEngine()->getVersion()->getComplete();
 
 		// Mark this detection routine as run.
 		$this->detection['engine'] = true;
@@ -475,83 +415,10 @@ class WebClient
 	 */
 	protected function detectPlatform($userAgent)
 	{
-		// Attempt to detect the client platform.
-		if (stripos($userAgent, 'Windows') !== false)
-		{
-			$this->platform = self::WINDOWS;
-
-			// Let's look at the specific mobile options in the Windows space.
-			if (stripos($userAgent, 'Windows Phone') !== false)
-			{
-				$this->mobile = true;
-				$this->platform = self::WINDOWS_PHONE;
-			}
-			elseif (stripos($userAgent, 'Windows CE') !== false)
-			{
-				$this->mobile = true;
-				$this->platform = self::WINDOWS_CE;
-			}
-		}
-		elseif (stripos($userAgent, 'iPhone') !== false)
-		{
-			// Interestingly 'iPhone' is present in all iOS devices so far including iPad and iPods.
-			$this->mobile = true;
-			$this->platform = self::IPHONE;
-
-			// Let's look at the specific mobile options in the iOS space.
-			if (stripos($userAgent, 'iPad') !== false)
-			{
-				$this->platform = self::IPAD;
-			}
-			elseif (stripos($userAgent, 'iPod') !== false)
-			{
-				$this->platform = self::IPOD;
-			}
-		}
-		elseif (stripos($userAgent, 'iPad') !== false)
-		{
-			// In case where iPhone is not mentioed in iPad user agent string
-			$this->mobile = true;
-			$this->platform = self::IPAD;
-		}
-		elseif (stripos($userAgent, 'iPod') !== false)
-		{
-			// In case where iPhone is not mentioed in iPod user agent string
-			$this->mobile = true;
-			$this->platform = self::IPOD;
-		}
-		elseif (preg_match('/macintosh|mac os x/i', $userAgent))
-		{
-			// This has to come after the iPhone check because mac strings are also present in iOS devices.
-			$this->platform = self::MAC;
-		}
-		elseif (stripos($userAgent, 'Blackberry') !== false)
-		{
-			$this->mobile = true;
-			$this->platform = self::BLACKBERRY;
-		}
-		elseif (stripos($userAgent, 'Android') !== false)
-		{
-			$this->mobile = true;
-			$this->platform = self::ANDROID;
-			/**
-			 * Attempt to distinguish between Android phones and tablets
-			 * There is no totally foolproof method but certain rules almost always hold
-			 *   Android 3.x is only used for tablets
-			 *   Some devices and browsers encourage users to change their UA string to include Tablet.
-			 *   Google encourages manufacturers to exclude the string Mobile from tablet device UA strings.
-			 *   In some modes Kindle Android devices include the string Mobile but they include the string Silk.
-			 */
-			if (stripos($userAgent, 'Android 3') !== false || stripos($userAgent, 'Tablet') !== false
-				|| stripos($userAgent, 'Mobile') === false || stripos($userAgent, 'Silk') !== false )
-			{
-				$this->platform = self::ANDROIDTABLET;
-			}
-		}
-		elseif (stripos($userAgent, 'Linux') !== false)
-		{
-			$this->platform = self::LINUX;
-		}
+		// Attempt to detect the client platform (OS).
+		$this->platform        = $this->result->getOperatingSystem();
+		$this->platformVersion = $this->result->getOperatingSystem()->getVersion()->getComplete();
+		$this->mobile          = $this->result->getDevice()->getIsMobile();
 
 		// Mark this detection routine as run.
 		$this->detection['platform'] = true;
@@ -568,14 +435,7 @@ class WebClient
 	 */
 	protected function detectRobot($userAgent)
 	{
-		if (preg_match('/http|bot|bingbot|googlebot|robot|spider|slurp|crawler|curl|^$/i', $userAgent))
-		{
-			$this->robot = true;
-		}
-		else
-		{
-			$this->robot = false;
-		}
+		$this->robot = $this->result->isBot();
 
 		$this->detection['robot'] = true;
 	}
