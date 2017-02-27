@@ -8,8 +8,6 @@
 
 namespace Joomla\Application\Web;
 
-require_once 'vendor/autoload.php';
-
 use UserAgentParser\Provider;
 use UserAgentParser\Exception\NoResultFoundException;
 
@@ -294,17 +292,23 @@ class WebClient
 	 */
 	protected function getResult($userAgent)
 	{
+		$providerChain = new Provider\Chain(
+							array(
+								new Provider\PiwikDeviceDetector,
+								new Provider\WhichBrowser,
+							)
+							);
 		try
 		{
 			if (function_exists('getallheaders'))
 			// If php is working under Apache, there is a special function
 			{
 				// Optional add all headers, to improve the result further (used currently only by WhichBrowser)
-				$this->result = $this->providerChain->parse($userAgent, getallheaders());
+				$this->result = $providerChain->parse($userAgent, getallheaders());
 			}
 			else
 			{
-				$this->result = $this->providerChain->parse($userAgent);
+				$this->result = $providerChain->parse($userAgent);
 			}
 		}
 		catch (NoResultFoundException $ex)
