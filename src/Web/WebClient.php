@@ -9,7 +9,6 @@
 namespace Joomla\Application\Web;
 
 use UserAgentParser\Provider;
-// use UserAgentParser\Exception\NoResultFoundException;
 
 /**
  * Class to model a Web Client.
@@ -201,7 +200,6 @@ class WebClient
 		}
 
 		$this->getProvider();
-		$this->getResult($this->userAgent);
 	}
 
 	/**
@@ -334,6 +332,7 @@ class WebClient
 	 */
 	protected function detectBrowser($userAgent)
 	{
+		$this->getResult($userAgent);
 		// Attempt to detect the browser type.
 		$this->result->getBrowser()->getName();
 		$this->result->getBrowser()->getVersion()->getComplete();
@@ -375,6 +374,7 @@ class WebClient
 	 */
 	protected function detectEngine($userAgent)
 	{
+		$this->getResult($userAgent);
 		// Attempt to detect the client engine
 		$this->result->getRenderingEngine()->getName();
 		$this->result->getRenderingEngine()->getVersion()->getComplete();
@@ -416,6 +416,7 @@ class WebClient
 	 */
 	protected function detectPlatform($userAgent)
 	{
+		$this->getResult($userAgent);
 		// Attempt to detect the client platform (OS).
 		$this->result->getOperatingSystem();
 		$this->result->getOperatingSystem()->getVersion()->getComplete();
@@ -440,6 +441,7 @@ class WebClient
 	 */
 	protected function detectRobot($userAgent)
 	{
+		$this->getResult($userAgent);
 		$this->robot = $this->result->isBot();
 
 		$this->detection['robot'] = true;
