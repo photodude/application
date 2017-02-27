@@ -67,9 +67,9 @@ class WebClient
 	 * @since  __DEPLOY_VERSION__
 	 */
 	public $chainArray = array(
-							new Provider\PiwikDeviceDetector(),
-							new Provider\WhichBrowser(),
-							);
+						'obj1' => new Provider\PiwikDeviceDetector(),
+						'obj2' => new Provider\WhichBrowser(),
+						);
 
 	/**
 	 * @var    \UserAgentParser\Model\UserAgent The result from parsing the user agent.
