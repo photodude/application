@@ -56,6 +56,7 @@ class WebClient
 	const EDGE = 23;
 	const BLINK = 24;
 	const OTHER = 25;
+	const IOS = 26;
 
 	/**
 	 * @var    UserAgentParser\Provider\Chain  The provider chain.
@@ -76,6 +77,12 @@ class WebClient
 	protected $platform;
 
 	/**
+	 * @var    string  The detected platform name used by the web client.
+	 * @since  __DEPLOY_VERSION__
+	 */
+	protected $platformName;
+
+	/**
 	 * @var    string  The detected platform version used by the web client.
 	 * @since  __DEPLOY_VERSION__
 	 */
@@ -94,6 +101,12 @@ class WebClient
 	protected $engine;
 
 	/**
+	 * @var    string  The detected engine name used by the web client.
+	 * @since  __DEPLOY_VERSION__
+	 */
+	protected $engineName;
+
+	/**
 	 * @var    string  The detected engine version used by the web client.
 	 * @since  __DEPLOY_VERSION__
 	 */
@@ -104,6 +117,12 @@ class WebClient
 	 * @since  1.0
 	 */
 	protected $browser;
+
+	/**
+	 * @var    string  The detected browser name used by the web client.
+	 * @since  __DEPLOY_VERSION__
+	 */
+	protected $browserName;
 
 	/**
 	 * @var    string  The detected browser version used by the web client.
@@ -146,6 +165,12 @@ class WebClient
 	 * @since  1.0
 	 */
 	protected $robot = false;
+
+	/**
+	 * @var    boolean  True if the web client is Mobile device.
+	 * @since  __DEPLOY_VERSION__
+	 */
+	protected $mobile = false;
 
 	/**
 	 * @var    array  An array of flags determining whether or not a detection routine has been run.
@@ -333,6 +358,7 @@ class WebClient
 	protected function detectBrowser($userAgent)
 	{
 		$this->getResult($userAgent);
+
 		// Attempt to detect the browser type.
 		$this->result->getBrowser()->getName();
 		$this->result->getBrowser()->getVersion()->getComplete();
@@ -408,6 +434,7 @@ class WebClient
 	protected function detectEngine($userAgent)
 	{
 		$this->getResult($userAgent);
+
 		// Attempt to detect the client engine
 		$this->result->getRenderingEngine()->getName();
 		$this->result->getRenderingEngine()->getVersion()->getComplete();
@@ -482,7 +509,8 @@ class WebClient
 	protected function detectPlatform($userAgent)
 	{
 		$this->getResult($userAgent);
-		// Attempt to detect the client platform (OS).
+
+		// Attempt to detect the client platform (Operating System).
 		$this->result->getOperatingSystem();
 		$this->result->getOperatingSystem()->getVersion()->getComplete();
 		$this->mobile = $this->result->getDevice()->getIsMobile();
@@ -503,8 +531,6 @@ class WebClient
 			case 'Windows CE':
 				$this->platform = self::WINDOWS_CE;
 				break;
-			case 'iOS':
-				$this->platform = self::IOS;
 			case 'iPhone':
 				$this->platform = self::IPHONE;
 				break;
@@ -515,6 +541,9 @@ class WebClient
 			case 'iPod Touch':
 				$this->platform = self::IPOD;
 				break;
+			case 'iOS':
+				$this->platform = self::IOS;
+			case 'OSx':
 			case 'Mac':
 				$this->platform = self::MAC;
 				break;
@@ -552,6 +581,23 @@ class WebClient
 		$this->robot = $this->result->isBot();
 
 		$this->detection['robot'] = true;
+	}
+
+	/**
+	 * Determines if the browser is a mobile device or not.
+	 *
+	 * @param   string  $userAgent  The user-agent string to parse.
+	 *
+	 * @return  void
+	 *
+	 * @since   __DEPLOY_VERSION__
+	 */
+	protected function detectMobile($userAgent)
+	{
+		$this->getResult($userAgent);
+		$this->mobile = $this->result->isMobile();
+
+		$this->detection['mobile'] = true;
 	}
 
 	/**
