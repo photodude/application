@@ -464,7 +464,7 @@ class WebClient
 			case 'EdgeHTML':
 				$this->engine = self::EDGE;
 				break;
-			case 'Webkit':
+			case 'WebKit':
 				$this->engine = self::WEBKIT;
 				break;
 			case 'AppleWebKit':
