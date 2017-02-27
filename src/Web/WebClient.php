@@ -271,18 +271,19 @@ class WebClient
 	 */
 	protected function getProvider()
 	{
-		$this->providerChain = new Provider\Chain(array(
+		$this->providerChain = new Provider\Chain(
+							array(
 								new Provider\PiwikDeviceDetector,
 								new Provider\WhichBrowser,
-								)
+							)
 							);
 	}
 
 	/**
 	 * Method to get the result object.
 	 *
-	 * @param   string  $userAgent  The user-agent string to parse.
-	 * @param   UserAgentParser\Provider\Chain  $providerChain  The provider chain.
+	 * @param   string                          $userAgent      The user-agent string to parse.
+	 * @param   UserAgentParser\Provider\Chain  $providerChain  The provider chain object.
 	 *
 	 * @return void
 	 *
@@ -290,29 +291,22 @@ class WebClient
 	 */
 	protected function getResult($userAgent)
 	{
-		$chain = new Provider\Chain(array(
-									new Provider\PiwikDeviceDetector(),
-									new Provider\WhichBrowser(),
-									)
-		);
-
 		try
 		{
 			if (function_exists('getallheaders'))
 			// If php is working under Apache, there is a special function
 			{
 				// Optional add all headers, to improve the result further (used currently only by WhichBrowser)
-				$this->result = $chain->parse($userAgent, getallheaders());
+				$this->result = $this->providerChain->parse($userAgent, getallheaders());
 			}
 			else
 			{
-				$this->result = $chain->parse($userAgent);	
+				$this->result = $this->providerChain->parse($userAgent);
 			}
-
 		}
 		catch (NoResultFoundException $ex)
 		{
-			// nothing found
+			// Nothing found
 		}
 	}
 
@@ -330,7 +324,6 @@ class WebClient
 		// Attempt to detect the browser type.
 		$this->browser = $this->result->getBrowser()->getName();
 		$this->browserVersion = $this->result->getBrowser()->getVersion()->getComplete();
-
 
 		// Mark this detection routine as run.
 		$this->detection['browser'] = true;
@@ -366,8 +359,8 @@ class WebClient
 	protected function detectEngine($userAgent)
 	{
 		// Attempt to detect the client engine
-		$this->engine =  $this->result->getRenderingEngine()->getName();
-		$this->engineVersion =  $this->result->getRenderingEngine()->getVersion()->getComplete();
+		$this->engine        = $this->result->getRenderingEngine()->getName();
+		$this->engineVersion = $this->result->getRenderingEngine()->getVersion()->getComplete();
 
 		// Mark this detection routine as run.
 		$this->detection['engine'] = true;
