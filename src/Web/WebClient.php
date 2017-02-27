@@ -63,15 +63,6 @@ class WebClient
 	protected $providerChain;
 
 	/**
-	 * @var    array  an array of providers used for chaining.
-	 * @since  __DEPLOY_VERSION__
-	 */
-	public $chainArray = array(
-						'obj1' => new Provider\PiwikDeviceDetector(),
-						'obj2' => new Provider\WhichBrowser(),
-						);
-
-	/**
 	 * @var    \UserAgentParser\Model\UserAgent The result from parsing the user agent.
 	 * @since  __DEPLOY_VERSION__
 	 */
@@ -274,21 +265,17 @@ class WebClient
 	/**
 	 * Method to get the result object.
 	 *
-	 * @param   array  $chainArray  An array of chain providers for parsing.
-	 *
 	 * @return void
 	 *
 	 * @since   __DEPLOY_VERSION__
 	 */
-	protected function getProvider($chainArray = null)
+	protected function getProvider()
 	{
-		// If an explicit chain Array was given attempt to use it.
-		if ($chainArray != null)
-		{
-			$this->chainArray = $chainArray;
-		}
-
-		$this->providerChain = new Provider\Chain($this->chainArray);
+		$this->providerChain = new Provider\Chain(array(
+								new Provider\PiwikDeviceDetector,
+								new Provider\WhichBrowser,
+								)
+							);
 	}
 
 	/**
