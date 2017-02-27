@@ -187,8 +187,8 @@ class WebClient
 			$this->acceptLanguage = $acceptLanguage;
 		}
 
-		$this->providerChain = self::getProvider();
-		$this->result = self::getResult($this->userAgent);
+		$this->providerChain = $this->getProvider();
+		$this->result = $this->getResult($this->userAgent);
 	}
 
 	/**
