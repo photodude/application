@@ -9,7 +9,7 @@
 namespace Joomla\Application\Web;
 
 use UserAgentParser\Provider;
-use UserAgentParser\Exception\NoResultFoundException;
+// use UserAgentParser\Exception\NoResultFoundException;
 
 /**
  * Class to model a Web Client.
@@ -311,22 +311,15 @@ class WebClient
 							)
 							);
 
-		try
+		if (function_exists('getallheaders'))
+		// If php is working under Apache, there is a special function
 		{
-			if (function_exists('getallheaders'))
-			// If php is working under Apache, there is a special function
-			{
-				// Optional add all headers, to improve the result further (used currently only by WhichBrowser)
-				$this->result = $providerChain->parse($userAgent, getallheaders());
-			}
-			else
-			{
-				$this->result = $providerChain->parse($userAgent);
-			}
+			// Optional add all headers, to improve the result further (used currently only by WhichBrowser)
+			$this->result = $providerChain->parse($userAgent, getallheaders());
 		}
-		catch (NoResultFoundException $ex)
+		else
 		{
-			// Nothing found
+			$this->result = $providerChain->parse($userAgent);
 		}
 	}
 
@@ -341,31 +334,6 @@ class WebClient
 	 */
 	protected function detectBrowser($userAgent)
 	{
-		$providerChain = new Provider\Chain(
-							array(
-								new Provider\PiwikDeviceDetector,
-								new Provider\WhichBrowser,
-							)
-							);
-
-		try
-		{
-			if (function_exists('getallheaders'))
-			// If php is working under Apache, there is a special function
-			{
-				// Optional add all headers, to improve the result further (used currently only by WhichBrowser)
-				$this->result = $providerChain->parse($userAgent, getallheaders());
-			}
-			else
-			{
-				$this->result = $providerChain->parse($userAgent);
-			}
-		}
-		catch (NoResultFoundException $ex)
-		{
-			// Nothing found
-		}
-
 		// Attempt to detect the browser type.
 		$this->result->getBrowser()->getName();
 		$this->result->getBrowser()->getVersion()->getComplete();
@@ -407,34 +375,6 @@ class WebClient
 	 */
 	protected function detectEngine($userAgent)
 	{
-		$providerChain = new Provider\Chain(
-							array(
-								new Provider\PiwikDeviceDetector,
-								new Provider\WhichBrowser,
-							)
-							);
-		/**
-		try
-		{
-			if (function_exists('getallheaders'))
-			// If php is working under Apache, there is a special function
-			{
-				// Optional add all headers, to improve the result further (used currently only by WhichBrowser)
-				$this->result = $providerChain->parse($userAgent, getallheaders());
-			}
-			else
-			{
-				$this->result = $providerChain->parse($userAgent);
-			}
-		}
-		catch (NoResultFoundException $ex)
-		{
-			// Nothing found
-		}
-		*/
-
-		$this->result = $providerChain->parse($userAgent);
-
 		// Attempt to detect the client engine
 		$this->result->getRenderingEngine()->getName();
 		$this->result->getRenderingEngine()->getVersion()->getComplete();
@@ -476,31 +416,6 @@ class WebClient
 	 */
 	protected function detectPlatform($userAgent)
 	{
-		$providerChain = new Provider\Chain(
-							array(
-								new Provider\PiwikDeviceDetector,
-								new Provider\WhichBrowser,
-							)
-							);
-
-		try
-		{
-			if (function_exists('getallheaders'))
-			// If php is working under Apache, there is a special function
-			{
-				// Optional add all headers, to improve the result further (used currently only by WhichBrowser)
-				$this->result = $providerChain->parse($userAgent, getallheaders());
-			}
-			else
-			{
-				$this->result = $providerChain->parse($userAgent);
-			}
-		}
-		catch (NoResultFoundException $ex)
-		{
-			// Nothing found
-		}
-
 		// Attempt to detect the client platform (OS).
 		$this->result->getOperatingSystem();
 		$this->result->getOperatingSystem()->getVersion()->getComplete();
@@ -525,31 +440,6 @@ class WebClient
 	 */
 	protected function detectRobot($userAgent)
 	{
-		$providerChain = new Provider\Chain(
-							array(
-								new Provider\PiwikDeviceDetector,
-								new Provider\WhichBrowser,
-							)
-							);
-
-		try
-		{
-			if (function_exists('getallheaders'))
-			// If php is working under Apache, there is a special function
-			{
-				// Optional add all headers, to improve the result further (used currently only by WhichBrowser)
-				$this->result = $providerChain->parse($userAgent, getallheaders());
-			}
-			else
-			{
-				$this->result = $providerChain->parse($userAgent);
-			}
-		}
-		catch (NoResultFoundException $ex)
-		{
-			// Nothing found
-		}
-
 		$this->robot = $this->result->isBot();
 
 		$this->detection['robot'] = true;
