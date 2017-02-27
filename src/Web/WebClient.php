@@ -305,10 +305,12 @@ class WebClient
 			{
 				// Optional add all headers, to improve the result further (used currently only by WhichBrowser)
 				$this->result = $providerChain->parse($userAgent, getallheaders());
+var_dump($this->result);
 			}
 			else
 			{
 				$this->result = $providerChain->parse($userAgent);
+var_dump($this->result);
 			}
 		}
 		catch (NoResultFoundException $ex)
