@@ -370,7 +370,7 @@ class WebClient
 		$this->result->getBrowser()->getName();
 		$this->result->getBrowser()->getVersion()->getComplete();
 
-		$resultArray = $result->toArray();
+		$resultArray = $this->result->toArray();
 		$this->browser = $resultArray;
 		$this->browserVersion = $resultArray;
 
@@ -436,7 +436,7 @@ class WebClient
 		$this->result->getRenderingEngine()->getName();
 		$this->result->getRenderingEngine()->getVersion()->getComplete();
 
-		$resultArray = $result->toArray();
+		$resultArray = $this->result->toArray();
 		$this->engine        = $resultArray;
 		$this->engineVersion = $resultArray;
 
@@ -503,7 +503,7 @@ class WebClient
 		$this->result->getOperatingSystem()->getVersion()->getComplete();
 		$this->mobile = $this->result->getDevice()->getIsMobile();
 
-		$resultArray = $result->toArray();
+		$resultArray = $this->result->toArray();
 		$this->platform        = $resultArray;
 		$this->platformVersion = $resultArray;
 
