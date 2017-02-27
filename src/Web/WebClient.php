@@ -55,6 +55,7 @@ class WebClient
 	const ANDROIDTABLET = 22;
 	const EDGE = 23;
 	const BLINK = 24;
+	const OTHER = 25;
 
 	/**
 	 * @var    UserAgentParser\Provider\Chain  The provider chain.
@@ -337,9 +338,41 @@ class WebClient
 		$this->result->getBrowser()->getVersion()->getComplete();
 
 		$resultArray = $this->result->toArray();
-var_dump($resultArray);
-		$this->browser = $resultArray;
-		$this->browserVersion = $resultArray;
+		$this->browserName = $resultArray['browser']['name'];
+		$this->browserVersion = $resultArray['browser']['version']['complete'];
+
+		switch ($this->browserName)
+		{
+			case 'Internet Explorer':
+				$this->browser = self::IE;
+				break;
+			case 'Microsoft Edge':
+				$this->browser = self::EDGE;
+				break;
+			case 'Firefox':
+				$this->browser = self::FIREFOX;
+				break;
+			case 'Opera':
+			case 'Opera Mobile':
+				$this->browser = self::OPERA;
+				break;
+			case 'Chrome':
+			case 'Chromium':
+				$this->browser = self::CHROME;
+				break;
+			case 'Safari':
+			case 'Mobile Safari':
+				$this->browser = self::SAFARI;
+				break;
+			case 'BlackBerry Browser':
+				$this->browser = self::BLACKBERRY;
+				break;
+			case 'Android Browser':
+				$this->browser = self::ANDROID;
+				break;
+			default:
+				$this->browser = self::OTHER;
+		}
 
 		// Mark this detection routine as run.
 		$this->detection['browser'] = true;
@@ -380,9 +413,40 @@ var_dump($resultArray);
 		$this->result->getRenderingEngine()->getVersion()->getComplete();
 
 		$resultArray = $this->result->toArray();
-var_dump($resultArray);
-		$this->engine        = $resultArray;
-		$this->engineVersion = $resultArray;
+		$this->engineName    = $resultArray['renderingEngine']['name'];
+		$this->engineVersion = $resultArray['renderingEngine']['version']['complete'];
+
+		switch ($this->engineName)
+		{
+			case 'Trident':
+				$this->engine = self::TRIDENT;
+				break;
+			case 'Edge':
+			case 'EdgeHTML':
+				$this->engine = self::EDGE;
+				break;
+			case 'Webkit':
+				$this->engine = self::WEBKIT;
+				break;
+			case 'AppleWebKit':
+			case 'Blink':
+				$this->engine = self::BLINK;
+				break;
+			case 'Gecko':
+				$this->engine = self::GECKO;
+				break;
+			case 'Presto':
+				$this->engine = self::PRESTO;
+				break;
+			case 'KHTML':
+				$this->engine = self::KHTML;
+				break;
+			case 'Amaya':
+				$this->engine = self::AMAYA;
+				break;
+			default:
+				$this->engine = self::OTHER;
+		}
 
 		// Mark this detection routine as run.
 		$this->detection['engine'] = true;
@@ -424,9 +488,50 @@ var_dump($resultArray);
 		$this->mobile = $this->result->getDevice()->getIsMobile();
 
 		$resultArray = $this->result->toArray();
-var_dump($resultArray);
-		$this->platform        = $resultArray;
-		$this->platformVersion = $resultArray;
+
+		$this->platformName    = $resultArray['operatingSystem']['name'];
+		$this->platformVersion = $resultArray['operatingSystem']['version']['complete'];
+
+		switch ($this->platformName)
+		{
+			case 'Windows':
+				$this->platform = self::WINDOWS;
+				break;
+			case 'Windows Phone':
+				$this->platform = self::WINDOWS_PHONE;
+				break;
+			case 'Windows CE':
+				$this->platform = self::WINDOWS_CE;
+				break;
+			case 'iOS':
+				$this->platform = self::IOS;
+			case 'iPhone':
+				$this->platform = self::IPHONE;
+				break;
+			case 'iPad':
+				$this->platform = self::IPAD;
+				break;
+			case 'iPod':
+			case 'iPod Touch':
+				$this->platform = self::IPOD;
+				break;
+			case 'Mac':
+				$this->platform = self::MAC;
+				break;
+			case 'Ubuntu':
+			case 'Kubuntu':
+			case 'Linux':
+				$this->platform = self::LINUX;
+				break;
+			case 'BlackBerry OS':
+				$this->platform = self::BLACKBERRY;
+				break;
+			case 'Android':
+				$this->platform = self::ANDROID;
+				break;
+			default:
+				$this->platform = self::OTHER;
+		}
 
 		// Mark this detection routine as run.
 		$this->detection['platform'] = true;
