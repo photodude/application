@@ -55,8 +55,8 @@ class WebClient
 	const ANDROIDTABLET = 22;
 	const EDGE = 23;
 	const BLINK = 24;
-	const OTHER = 25;
-	const IOS = 26;
+	const IOS = 25;
+	const OTHER = '';
 
 	/**
 	 * @var    UserAgentParser\Provider\Chain  The provider chain.
