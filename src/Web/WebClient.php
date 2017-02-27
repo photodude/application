@@ -95,6 +95,12 @@ class WebClient
 	protected $mobile = false;
 
 	/**
+	 * @var    boolean  True if the device is a touch device.
+	 * @since  1.0
+	 */
+	protected $touch = false;
+
+	/**
 	 * @var    integer  The detected rendering engine used by the web client.
 	 * @since  1.0
 	 */
@@ -513,27 +519,12 @@ class WebClient
 
 		$this->platformName    = $resultArray['operatingSystem']['name'];
 		$this->platformVersion = $resultArray['operatingSystem']['version']['complete'];
+		$this->device          = $resultArray['device']['version']['complete'];
 
 		switch ($this->platformName)
 		{
 			case 'Windows':
 				$this->platform = self::WINDOWS;
-				break;
-			case 'Windows Phone':
-				$this->platform = self::WINDOWS_PHONE;
-				break;
-			case 'Windows CE':
-				$this->platform = self::WINDOWS_CE;
-				break;
-			case 'iPhone':
-				$this->platform = self::IPHONE;
-				break;
-			case 'iPad':
-				$this->platform = self::IPAD;
-				break;
-			case 'iPod':
-			case 'iPod Touch':
-				$this->platform = self::IPOD;
 				break;
 			case 'iOS':
 				$this->platform = self::IOS;
@@ -555,6 +546,27 @@ class WebClient
 			default:
 				$this->platform = self::OTHER;
 		}
+
+		switch ($this->device)
+		{
+			case 'Windows Phone':
+				$this->platform = self::WINDOWS_PHONE;
+				break;
+			case 'Windows CE':
+				$this->platform = self::WINDOWS_CE;
+				break;
+			case 'iPhone':
+				$this->platform = self::IPHONE;
+				break;
+			case 'iPad':
+				$this->platform = self::IPAD;
+				break;
+			case 'iPod':
+			case 'iPod Touch':
+				$this->platform = self::IPOD;
+				break;
+		}
+
 
 		// Mark this detection routine as run.
 		$this->detection['platform'] = true;
@@ -592,6 +604,23 @@ class WebClient
 		$this->mobile = $this->result->isMobile();
 
 		$this->detection['mobile'] = true;
+	}
+
+	/**
+	 * Determines if the device is a touch device or not.
+	 *
+	 * @param   string  $userAgent  The user-agent string to parse.
+	 *
+	 * @return  void
+	 *
+	 * @since   __DEPLOY_VERSION__
+	 */
+	protected function detectTouch($userAgent)
+	{
+		$this->getResult($userAgent);
+		$this->touch = $this->result->getDevice()->getIsTouch();
+
+		$this->detection['touch'] = true;
 	}
 
 	/**
