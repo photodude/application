@@ -198,8 +198,6 @@ class WebClient
 		{
 			$this->acceptLanguage = $acceptLanguage;
 		}
-
-		$this->getProvider();
 	}
 
 	/**
@@ -308,6 +306,7 @@ class WebClient
 								new Provider\WhichBrowser,
 							)
 							);
+		$this->getProvider();
 
 		if (function_exists('getallheaders'))
 		// If php is working under Apache, there is a special function
