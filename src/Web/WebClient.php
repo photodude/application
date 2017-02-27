@@ -76,6 +76,12 @@ class WebClient
 	protected $platform;
 
 	/**
+	 * @var    string  The detected platform version used by the web client.
+	 * @since  __DEPLOY_VERSION__
+	 */
+	protected $platformVersion;
+
+	/**
 	 * @var    boolean  True if the web client is a mobile device.
 	 * @since  1.0
 	 */
@@ -86,6 +92,12 @@ class WebClient
 	 * @since  1.0
 	 */
 	protected $engine;
+
+	/**
+	 * @var    string  The detected engine version used by the web client.
+	 * @since  __DEPLOY_VERSION__
+	 */
+	protected $engineVersion;
 
 	/**
 	 * @var    integer  The detected browser used by the web client.
@@ -375,8 +387,8 @@ class WebClient
 		$this->result->getRenderingEngine()->getVersion()->getComplete();
 
 		$resultArray = $result->toArray();
-		$this->engine        = $resultArray
-		$this->engineVersion = $resultArray
+		$this->engine        = $resultArray;
+		$this->engineVersion = $resultArray;
 
 		// Mark this detection routine as run.
 		$this->detection['engine'] = true;
@@ -414,12 +426,11 @@ class WebClient
 		// Attempt to detect the client platform (OS).
 		$this->result->getOperatingSystem();
 		$this->result->getOperatingSystem()->getVersion()->getComplete();
-		$this->result->getDevice()->getIsMobile();
+		$this->mobile = $this->result->getDevice()->getIsMobile();
 
 		$resultArray = $result->toArray();
-		$this->platform        = $resultArray
-		$this->platformVersion = $resultArray
-		$this->mobile          = $resultArray
+		$this->platform        = $resultArray;
+		$this->platformVersion = $resultArray;
 
 		// Mark this detection routine as run.
 		$this->detection['platform'] = true;
