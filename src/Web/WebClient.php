@@ -491,6 +491,12 @@ class WebClient
 				$this->engine = self::OTHER;
 		}
 
+		if (stripos($resultArray['operatingSystem']['name'], 'blackberry') !== false)
+		{
+			// Evidently blackberry uses WebKit and doesn't necessarily report it.  Bad RIM.
+			$this->engine = self::WEBKIT;
+		}
+
 		// Mark this detection routine as run.
 		$this->detection['engine'] = true;
 	}
@@ -556,6 +562,13 @@ class WebClient
 				break;
 			case 'BlackBerry OS':
 				$this->platform = self::BLACKBERRY;
+
+				if (!$this->engine)
+				{
+					// Evidently blackberry uses WebKit and doesn't necessarily report it.  Bad RIM.
+					$this->engine = self::WEBKIT;
+				}
+
 				break;
 			case 'Android':
 				$this->platform = self::ANDROID;
