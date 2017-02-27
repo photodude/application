@@ -413,7 +413,7 @@ class WebClient
 								new Provider\WhichBrowser,
 							)
 							);
-
+		/**
 		try
 		{
 			if (function_exists('getallheaders'))
@@ -431,6 +431,9 @@ class WebClient
 		{
 			// Nothing found
 		}
+		*/
+
+		$this->result = $providerChain->parse($userAgent);
 
 		// Attempt to detect the client engine
 		$this->result->getRenderingEngine()->getName();
