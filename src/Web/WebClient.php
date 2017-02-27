@@ -89,6 +89,18 @@ class WebClient
 	protected $platformVersion;
 
 	/**
+	 * @var    string  The detected device used by the web client.
+	 * @since  __DEPLOY_VERSION__
+	 */
+	protected $device;
+
+	/**
+	 * @var    string  The detected device type used by the web client.
+	 * @since  __DEPLOY_VERSION__
+	 */
+	protected $deviceType;
+
+	/**
 	 * @var    boolean  True if the web client is a mobile device.
 	 * @since  1.0
 	 */
@@ -96,7 +108,7 @@ class WebClient
 
 	/**
 	 * @var    boolean  True if the device is a touch device.
-	 * @since  1.0
+	 * @since  __DEPLOY_VERSION__
 	 */
 	protected $touch = false;
 
@@ -519,7 +531,8 @@ class WebClient
 
 		$this->platformName    = $resultArray['operatingSystem']['name'];
 		$this->platformVersion = $resultArray['operatingSystem']['version']['complete'];
-		$this->device          = $resultArray['device']['version']['complete'];
+		$this->device          = $resultArray['device']['brand'];
+		$this->deviceType      = $resultArray['device']['type'];
 
 		switch ($this->platformName)
 		{
