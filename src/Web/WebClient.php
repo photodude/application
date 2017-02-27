@@ -298,6 +298,7 @@ class WebClient
 								new Provider\WhichBrowser,
 							)
 							);
+
 		try
 		{
 			if (function_exists('getallheaders'))
@@ -305,12 +306,10 @@ class WebClient
 			{
 				// Optional add all headers, to improve the result further (used currently only by WhichBrowser)
 				$this->result = $providerChain->parse($userAgent, getallheaders());
-var_dump($this->result);
 			}
 			else
 			{
 				$this->result = $providerChain->parse($userAgent);
-var_dump($this->result);
 			}
 		}
 		catch (NoResultFoundException $ex)
@@ -330,6 +329,31 @@ var_dump($this->result);
 	 */
 	protected function detectBrowser($userAgent)
 	{
+		$providerChain = new Provider\Chain(
+							array(
+								new Provider\PiwikDeviceDetector,
+								new Provider\WhichBrowser,
+							)
+							);
+
+		try
+		{
+			if (function_exists('getallheaders'))
+			// If php is working under Apache, there is a special function
+			{
+				// Optional add all headers, to improve the result further (used currently only by WhichBrowser)
+				$this->result = $providerChain->parse($userAgent, getallheaders());
+			}
+			else
+			{
+				$this->result = $providerChain->parse($userAgent);
+			}
+		}
+		catch (NoResultFoundException $ex)
+		{
+			// Nothing found
+		}
+
 		// Attempt to detect the browser type.
 		$this->browser = $this->result->getBrowser()->getName();
 		$this->browserVersion = $this->result->getBrowser()->getVersion()->getComplete();
@@ -367,6 +391,31 @@ var_dump($this->result);
 	 */
 	protected function detectEngine($userAgent)
 	{
+		$providerChain = new Provider\Chain(
+							array(
+								new Provider\PiwikDeviceDetector,
+								new Provider\WhichBrowser,
+							)
+							);
+
+		try
+		{
+			if (function_exists('getallheaders'))
+			// If php is working under Apache, there is a special function
+			{
+				// Optional add all headers, to improve the result further (used currently only by WhichBrowser)
+				$this->result = $providerChain->parse($userAgent, getallheaders());
+			}
+			else
+			{
+				$this->result = $providerChain->parse($userAgent);
+			}
+		}
+		catch (NoResultFoundException $ex)
+		{
+			// Nothing found
+		}
+
 		// Attempt to detect the client engine
 		$this->engine        = $this->result->getRenderingEngine()->getName();
 		$this->engineVersion = $this->result->getRenderingEngine()->getVersion()->getComplete();
@@ -404,6 +453,31 @@ var_dump($this->result);
 	 */
 	protected function detectPlatform($userAgent)
 	{
+		$providerChain = new Provider\Chain(
+							array(
+								new Provider\PiwikDeviceDetector,
+								new Provider\WhichBrowser,
+							)
+							);
+
+		try
+		{
+			if (function_exists('getallheaders'))
+			// If php is working under Apache, there is a special function
+			{
+				// Optional add all headers, to improve the result further (used currently only by WhichBrowser)
+				$this->result = $providerChain->parse($userAgent, getallheaders());
+			}
+			else
+			{
+				$this->result = $providerChain->parse($userAgent);
+			}
+		}
+		catch (NoResultFoundException $ex)
+		{
+			// Nothing found
+		}
+
 		// Attempt to detect the client platform (OS).
 		$this->platform        = $this->result->getOperatingSystem();
 		$this->platformVersion = $this->result->getOperatingSystem()->getVersion()->getComplete();
@@ -424,6 +498,31 @@ var_dump($this->result);
 	 */
 	protected function detectRobot($userAgent)
 	{
+		$providerChain = new Provider\Chain(
+							array(
+								new Provider\PiwikDeviceDetector,
+								new Provider\WhichBrowser,
+							)
+							);
+
+		try
+		{
+			if (function_exists('getallheaders'))
+			// If php is working under Apache, there is a special function
+			{
+				// Optional add all headers, to improve the result further (used currently only by WhichBrowser)
+				$this->result = $providerChain->parse($userAgent, getallheaders());
+			}
+			else
+			{
+				$this->result = $providerChain->parse($userAgent);
+			}
+		}
+		catch (NoResultFoundException $ex)
+		{
+			// Nothing found
+		}
+
 		$this->robot = $this->result->isBot();
 
 		$this->detection['robot'] = true;
