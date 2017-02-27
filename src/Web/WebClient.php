@@ -405,8 +405,12 @@ class WebClient
 			case 'BlackBerry Browser':
 				$this->browser = self::BLACKBERRY;
 				break;
+			case 'Android':
 			case 'Android Browser':
 				$this->browser = self::ANDROID;
+				break;
+			case 'Amaya':
+				$this->browser = self::AMAYA;
 				break;
 			default:
 				$this->browser = self::OTHER;
