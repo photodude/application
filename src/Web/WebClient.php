@@ -549,14 +549,26 @@ class WebClient
 			case 'Windows':
 				$this->platform = self::WINDOWS;
 				break;
+			case 'Windows Phone':
+			case 'WPH':
+				$this->platform = self::WINDOWS_PHONE;
+				break;
+			case 'Windows Mobile':
+			case 'Windows CE':
+			case 'WinCE':
+			case 'WCE':
+				$this->platform = self::WINDOWS_CE;
+				break;
 			case 'iOS':
 				$this->platform = self::IOS;
-			case 'OSx':
+			case 'OS X':
 			case 'Mac':
+			case 'MAC':
 				$this->platform = self::MAC;
 				break;
 			case 'Ubuntu':
 			case 'Kubuntu':
+			case 'Fedora':
 			case 'Linux':
 				$this->platform = self::LINUX;
 				break;
@@ -571,7 +583,15 @@ class WebClient
 
 				break;
 			case 'Android':
-				$this->platform = self::ANDROID;
+				if ($this->deviceType == 'tablet')
+				{
+					$this->platform = self::ANDROIDTABLET;
+				}
+				else
+				{
+					$this->platform = self::ANDROID;
+				}
+
 				break;
 			default:
 				$this->platform = self::OTHER;
@@ -579,12 +599,6 @@ class WebClient
 
 		switch ($this->device)
 		{
-			case 'Windows Phone':
-				$this->platform = self::WINDOWS_PHONE;
-				break;
-			case 'Windows CE':
-				$this->platform = self::WINDOWS_CE;
-				break;
 			case 'iPhone':
 				$this->platform = self::IPHONE;
 				break;
